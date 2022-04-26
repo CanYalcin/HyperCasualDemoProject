@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour
                     Reset();
                 }
             
-            float zSpeed = forwardSpeed * Time.deltaTime * 5;
+            float zSpeed = forwardSpeed * Time.deltaTime;
             rb.MovePosition(new Vector3(newPosX, transform.position.y, transform.position.z + zSpeed));
 #elif UNITY_ANDROID || UNITY_IOS
             float newPosX = transform.position.x;

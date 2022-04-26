@@ -60,10 +60,6 @@ public class RunnerAI : MonoBehaviour
                             xSpeed *= -1;
                     }
                 }
-#if UNITY_STANDALONE_WIN
-zSpeed *= 5;
-xSpeed *= 5;
-#endif
                 rb.MovePosition(new Vector3(transform.position.x + xSpeed, transform.position.y, transform.position.z + zSpeed));
             }
         }
