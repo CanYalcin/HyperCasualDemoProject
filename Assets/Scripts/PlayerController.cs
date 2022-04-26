@@ -38,6 +38,30 @@ public class PlayerController : MonoBehaviour
         int gameStatus = gameManager.GetGameStatus(); // get game status
         if (gameStatus == 0) // if game didnt start yet
         {
+#if UNITY_STANDALONE_WIN
+                swipeDelta = Vector2.zero;
+                float newPosX = transform.position.x;
+                if (Input.GetMouseButtonDown(0))
+                {
+                    gameManager.SetGameStatus(1);
+                    playerAnim.SetBool("GameStarted", true); // and player starts to run
+                    startTouch = Input.mousePosition;
+                }
+                else if (Input.GetMouseButton(0))
+                {
+                    var mousePos = new Vector2(Input.mousePosition.x,Input.mousePosition.y);
+                    swipeDelta = mousePos - startTouch; // how much touch moved?
+
+                    float xDist = swipeDelta.x / width; // and what is the x movement of touch
+                    float xSpeed = xDist * xMoveSpeed * Time.deltaTime;
+                    newPosX = transform.position.x + xSpeed;
+                    newPosX = Mathf.Clamp(newPosX, -maxClamp, maxClamp); // new position cant be outside of (-maxclamp,maxclamp)
+                }
+                else if (Input.GetMouseButtonUp(0))
+                {
+                    Reset();
+                }
+#elif UNITY_ANDROID || UNITY_IOS
             if (Input.touchCount > 0)
             {
                 Touch touch = Input.touches[0];
@@ -63,10 +87,35 @@ public class PlayerController : MonoBehaviour
                     newPosX = Mathf.Clamp(newPosX, -maxClamp, maxClamp); // new position cant be outside of (-maxclamp,maxclamp)
                 }
             }
+#endif
         }
-        //#endif
         if (gameStatus == 1)
         {
+#if UNITY_STANDALONE_WIN
+            float newPosX = transform.position.x;
+            swipeDelta = Vector2.zero;
+            if (Input.GetMouseButtonDown(0)) // lets get the start touch pos
+            {
+                startTouch = Input.mousePosition;
+            }
+            else if(Input.GetMouseButton(0))
+            {
+                    var mousePos = new Vector2(Input.mousePosition.x,Input.mousePosition.y);
+                    swipeDelta = mousePos - startTouch; // how much touch moved?
+                    
+                    float xDist = swipeDelta.x / width; // and what is the x movement of touch
+                    float xSpeed = xDist * xMoveSpeed * Time.deltaTime;
+                    newPosX = transform.position.x + xSpeed;
+                    newPosX = Mathf.Clamp(newPosX, -maxClamp, maxClamp); // new position cant be outside of (-maxclamp,maxclamp)
+            }
+            else if (Input.GetMouseButtonUp(0))
+                {
+                    Reset();
+                }
+            
+            float zSpeed = forwardSpeed * Time.deltaTime * 5;
+            rb.MovePosition(new Vector3(newPosX, transform.position.y, transform.position.z + zSpeed));
+#elif UNITY_ANDROID || UNITY_IOS
             float newPosX = transform.position.x;
             if (Input.touchCount > 0)
             {
@@ -92,6 +141,7 @@ public class PlayerController : MonoBehaviour
             }
             float zSpeed = forwardSpeed * Time.deltaTime;
             rb.MovePosition(new Vector3(newPosX, transform.position.y, transform.position.z + zSpeed));
+#endif
         }
     }
 

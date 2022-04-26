@@ -35,9 +35,19 @@ public class PaintController : MonoBehaviour
     {
         if (saving)
             return;
-        if (Input.touchCount > 0 && gameManager.GetGameStatus() == 2) // will only work after player finish the game
+        if(gameManager.GetGameStatus() == 2)
         {
-            Paint();
+#if UNITY_STANDALONE_WIN
+            if(Input.GetMouseButton(0))
+            {
+                Paint();
+            }
+#elif UNITY_ANDROID || UNITY_IOS
+            if (Input.touchCount > 0) // will only work after player finish the game
+            {
+                Paint();
+            }
+#endif
         }
     }
 
@@ -67,8 +77,13 @@ public class PaintController : MonoBehaviour
     bool HitTestUVPosition(ref Vector3 hitPos) // check if touch pos hits the wall and return a boolean value. hitpos is ref to get touch hit position on the wall
     {
         RaycastHit hit;
+        Vector3 cursorPos = Vector3.zero;
+#if UNITY_STANDALONE_WIN
+        cursorPos = new Vector3(Input.mousePosition.x,Input.mousePosition.y,0.0f);
+#elif UNITY_ANDROID || UNITY_IOS
         Touch t = Input.touches[0];
-        Vector3 cursorPos = new Vector3(t.position.x, t.position.y, 0.0f);
+        cursorPos = new Vector3(t.position.x, t.position.y, 0.0f);
+#endif
         Ray cursorRay = mainCam.ScreenPointToRay(cursorPos);
         if (Physics.Raycast(cursorRay, out hit, 25, layerMask)) // we used layermask to not hit anything unnecessary
         {
@@ -94,7 +109,7 @@ public class PaintController : MonoBehaviour
             if (colors[i].r > 100 && colors[i].g < 50 && colors[i].b < 50) // check if the pixel mostly red
                 ct++;
         }
-        paintRateText.text = "%" + (((float)ct / (float)colors.Length) * 200).ToString(); // red pixel count / total pixel count
+        paintRateText.text = "%" + (((float)ct / (float)colors.Length) * 100).ToString(); // red pixel count / total pixel count
 
         wallMat.mainTexture = tex; // change walls materials texture to new texture so we dont lose the paintings we did
         RenderTexture.active = null;

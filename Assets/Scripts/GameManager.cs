@@ -85,6 +85,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator YouWon()       // when player wins the game, stop "PlayerController" and start painting!
     {
+        gameStatus = 2;
         mainCam.gameObject.GetComponent<CameraFollow>().enabled = false;        // stop following player and show us his talent as an artist!
         while (Vector3.Distance(mainCam.transform.position, endGameCamPos) > 0.001f)
         {
@@ -95,6 +96,5 @@ public class GameManager : MonoBehaviour
         }
         player.GetComponent<PlayerController>().enabled = false;
         player.GetComponent<PaintController>().enabled = true;
-        gameStatus = 2;
     }
 }
